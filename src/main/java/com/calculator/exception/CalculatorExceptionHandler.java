@@ -46,10 +46,4 @@ public class CalculatorExceptionHandler {
         log.error("Missing parameter in request", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Required request parameter is missing");
     }
-
-    /*@ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity endpointNotFoundException(NoHandlerFoundException e) {
-        log.error("No endpoint found", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-    }*/
 }

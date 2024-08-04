@@ -49,7 +49,7 @@ public class UserService {
     public List<RecordRecord> getUserRecords() {
         UserRecord user = getAuthenticatedUser();
         List<RecordRecord> userRecords = recordRepository.findAllByUserIdOrderByDateDesc(user.id());
-        log.info("Requesting User's Records by user id: {}, records: {}", user.id(), userRecords);
+        log.info("Requesting User's Records by user id: {}, total records: {}", user.id(), userRecords.size());
         return userRecords;
     }
 

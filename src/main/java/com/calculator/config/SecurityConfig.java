@@ -19,6 +19,21 @@ import static org.springframework.boot.autoconfigure.security.servlet.PathReques
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private static final String[] AUTH_WHITELIST = {
+            // -- Swagger UI v2
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            // -- Swagger UI v3 (OpenAPI)
+            "/api-docs/**",
+            "/swagger-ui/**"
+            // other public endpoints of your API may be appended to this array
+    };
+
     /*
      * Establishes the paths that require authentication, also enables H2 console to be viewable
      * If the user tries to access a path before being authorized it gets redirected to the login page
@@ -29,7 +44,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.ignoringRequestMatchers(toH2Console()).disable())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(toH2Console()).permitAll()
-                        .requestMatchers("/v1/*").authenticated()
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))

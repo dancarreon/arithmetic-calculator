@@ -24,5 +24,5 @@ The following project was build with the following tech stack:
   - Username: `user1@test.com`
   - Password: `password`
 - The rest of the users follow the same pattern, just modify the number in the `username` for the next consecutive integer
-- Once a User has run out of budget it won't be possible to keep doing operations, you will have to choose another User or manually reset their budget, or app completely (to wipe out the in-memory DB)
+- Once a User has run out of budget it won't be possible to keep doing operations, you will have to choose another User, manually reset their budget or reset the app completely (to wipe out the in-memory DB)
 

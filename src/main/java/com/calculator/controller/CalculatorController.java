@@ -5,6 +5,7 @@ import com.calculator.service.CalculatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -39,20 +40,23 @@ public class CalculatorController {
     }
 
     @GetMapping("/division")
-    @ResponseStatus(HttpStatus.OK)
-    public Message getDivision(@RequestParam BigDecimal a, @RequestParam BigDecimal b) {
+    public ResponseEntity<Message> getDivision(@RequestParam BigDecimal a, @RequestParam BigDecimal b) {
         try {
-            return new Message(calculatorService.divide(a, b).toString());
+            return new ResponseEntity<>(new Message(calculatorService.divide(a, b).toString()), HttpStatus.OK);
         } catch (ArithmeticException e) {
             log.error(e);
-            return new Message("Cannot divide by zero");
+            return new ResponseEntity<>(new Message("Cannot divide by zero"), HttpStatus.BAD_REQUEST);
         }
     }
 
     @GetMapping("/square-root")
-    @ResponseStatus(HttpStatus.OK)
-    public BigDecimal getSquareRoot(@RequestParam BigDecimal a) {
-        return calculatorService.squareRoot(a);
+    public ResponseEntity<Message> getSquareRoot(@RequestParam BigDecimal a) {
+        try {
+            return new ResponseEntity<>(new Message(calculatorService.squareRoot(a).toString()), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Error attempting to square root of a negative number: {}", a);
+            return new ResponseEntity<>(new Message("Error attempting to square root of a negative number"), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/random-string")

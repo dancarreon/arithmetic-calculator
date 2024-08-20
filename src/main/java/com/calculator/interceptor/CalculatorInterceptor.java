@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -79,14 +80,15 @@ public class CalculatorInterceptor implements HandlerInterceptor {
     public void postHandle(@NonNull HttpServletRequest request,@NonNull HttpServletResponse response,@NonNull Object handler, ModelAndView modelAndView) throws Exception {
 
         if (getAuthenticatedUser() != null) {
+            if (response.getStatus() == HttpStatus.OK.value()) {
+                List<RecordRecord> userRecords = userService.getUserRecords();
+                UserRecord userRecord = userService.getAuthenticatedUser();
+                OperationRecord operationRecord = operationService.getOperationByType(getType(request.getRequestURI()));
 
-            List<RecordRecord> userRecords = userService.getUserRecords();
-            UserRecord userRecord = userService.getAuthenticatedUser();
-            OperationRecord operationRecord = operationService.getOperationByType(getType(request.getRequestURI()));
+                Record record = getRecord(operationRecord, userRecord, userRecords, response);
 
-            Record record = getRecord(operationRecord, userRecord, userRecords, response);
-
-            recordService.addRecord(record);
+                recordService.addRecord(record);
+            }
         }
     }
 
@@ -120,7 +122,7 @@ public class CalculatorInterceptor implements HandlerInterceptor {
     // Returns the Operation Type from the URI
     private Type getType(String URIOperation) {
         for (Type t : Type.values()) {
-            if (URIOperation.toLowerCase().contains(t.getType().toLowerCase())) {
+            if (URIOperation.toLowerCase().contains(t.name().replace("_", "-").toLowerCase())) {
                 return t;
             }
         }

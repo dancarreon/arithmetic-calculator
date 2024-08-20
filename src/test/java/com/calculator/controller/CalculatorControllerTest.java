@@ -11,10 +11,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WithMockUser(username = "user1@test.com")
 public class CalculatorControllerTest extends GenericControllerTest {
@@ -24,6 +25,8 @@ public class CalculatorControllerTest extends GenericControllerTest {
         when(userService.getAuthenticatedUser()).thenReturn(new UserRecord(1L, "username", "password", true));
         when(operationService.getOperationByType(any())).thenReturn(new OperationRecord(1L, Type.ADDITION, 1));
         when(calculatorService.divide(any(), any())).thenReturn(new BigDecimal(1));
+        when(calculatorService.squareRoot(new BigDecimal(1))).thenReturn(new BigDecimal(1));
+        when(calculatorService.squareRoot(new BigDecimal(-1))).thenThrow(ArithmeticException.class);
     }
 
     @Test
@@ -64,6 +67,15 @@ public class CalculatorControllerTest extends GenericControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldDoSquareRootNegativeNumber() throws Exception {
+        mockMvc.perform(get("/calculator/square-root?a=-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message", is("Error attempting to square root of a negative number")));
     }
 
     @Test
